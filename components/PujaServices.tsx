@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react";
-import { Dialog, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import { Fragment } from "react";
+import { useState, Fragment } from "react";
+import { Dialog, DialogTitle, Transition } from "@headlessui/react";
 import Image from "next/image";
+
+interface Puja {
+  name: string;
+  description: string;
+  price: string;
+  image: string;
+}
 
 export const PujaServices: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedPuja, setSelectedPuja] = useState<any>(null);
+  const [selectedPuja, setSelectedPuja] = useState<Puja | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
 
-  const pujaList = [
+  const pujaList: Puja[] = [
     {
       name: "Rudrabhishek Pooja",
       description:
@@ -51,7 +57,7 @@ export const PujaServices: React.FC = () => {
     "1:00 PM - 1:30 PM",
   ];
 
-  const openDialog = (puja: any) => {
+  const openDialog = (puja: Puja) => {
     setSelectedPuja(puja);
     setIsOpen(true);
   };
@@ -64,9 +70,9 @@ export const PujaServices: React.FC = () => {
   };
 
   const handleBooking = () => {
-    if (selectedTime) {
+    if (selectedTime && selectedPuja) {
       alert(
-        `Booked ${selectedPuja.name} for ${selectedDate.toDateString()} at ${selectedTime}`
+        `You have successfully booked the ${selectedPuja.name} on ${selectedDate.toDateString()} at ${selectedTime}.`
       );
       closeDialog();
     }
@@ -75,9 +81,9 @@ export const PujaServices: React.FC = () => {
   return (
     <section id="services" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-      <h2 className="text-4xl font-extrabold tracking-tight text-gray-800 text-center mb-12">
-  Puja Services
-</h2>
+        <h2 className="text-4xl font-extrabold tracking-tight text-gray-800 text-center mb-12">
+          Puja Services
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {pujaList.map((puja, index) => (
@@ -88,8 +94,8 @@ export const PujaServices: React.FC = () => {
               <Image
                 src={puja.image}
                 alt={puja.name}
-                width={200} // Adjust size as needed
-                height={40}
+                width={500}
+                height={400}
                 className="w-full h-40 object-cover"
               />
               <div className="p-6 text-center">
@@ -113,7 +119,7 @@ export const PujaServices: React.FC = () => {
       {/* Booking Dialog */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeDialog}>
-          <TransitionChild
+          <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0"
@@ -123,11 +129,11 @@ export const PujaServices: React.FC = () => {
             leaveTo="opacity-0"
           >
             <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </TransitionChild>
+          </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
-              <TransitionChild
+              <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
                 enterFrom="opacity-0 scale-95"
@@ -203,7 +209,7 @@ export const PujaServices: React.FC = () => {
                     </>
                   )}
                 </Dialog.Panel>
-              </TransitionChild>
+              </Transition.Child>
             </div>
           </div>
         </Dialog>
