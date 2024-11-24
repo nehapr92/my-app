@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
 import { Fragment } from "react";
+import Image from "next/image";
 
 export const PujaServices: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,9 +85,11 @@ export const PujaServices: React.FC = () => {
               key={index}
               className="bg-white shadow-lg rounded-lg overflow-hidden"
             >
-              <img
+              <Image
                 src={puja.image}
                 alt={puja.name}
+                width={200} // Adjust size as needed
+                height={40}
                 className="w-full h-40 object-cover"
               />
               <div className="p-6 text-center">
@@ -110,7 +113,7 @@ export const PujaServices: React.FC = () => {
       {/* Booking Dialog */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeDialog}>
-          <Transition.Child
+          <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0"
@@ -120,11 +123,11 @@ export const PujaServices: React.FC = () => {
             leaveTo="opacity-0"
           >
             <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
+          </TransitionChild>
 
           <div className="fixed inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
-              <Transition.Child
+              <TransitionChild
                 as={Fragment}
                 enter="ease-out duration-300"
                 enterFrom="opacity-0 scale-95"
@@ -136,12 +139,12 @@ export const PujaServices: React.FC = () => {
                 <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl transition-all">
                   {selectedPuja && (
                     <>
-                      <Dialog.Title
+                      <DialogTitle
                         as="h3"
                         className="text-lg font-medium leading-6 text-gray-900"
                       >
                         Book {selectedPuja.name}
-                      </Dialog.Title>
+                      </DialogTitle>
                       <div className="mt-4">
                         <label
                           htmlFor="date"
@@ -200,7 +203,7 @@ export const PujaServices: React.FC = () => {
                     </>
                   )}
                 </Dialog.Panel>
-              </Transition.Child>
+              </TransitionChild>
             </div>
           </div>
         </Dialog>

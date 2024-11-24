@@ -88,6 +88,7 @@ const Navbar: React.FC = () => {
             isOpen ? "flex flex-col space-y-4 p-8 bg-orange-400" : ""
           }`}
         >
+
           <li className="text-center lg:inline-block">
             <Link href="#services" onClick={() => setIsOpen(false)}>
               Pooja Services
