@@ -1,102 +1,141 @@
 "use client";
 
+import { useState } from "react";
 import { Disclosure } from "@headlessui/react";
 
 const ContactUs: React.FC = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Frequently asked questions (FAQs)
   const faqs = [
     {
-      question: "What are the darshan timings at Baidyanath Dham?",
+      question: "बाबा धाम में दर्शन के समय क्या हैं?",
       answer:
-        "The temple is open for darshan from 5:00 AM to 9:00 PM daily. Timings may vary on special occasions or festivals.",
+        "मंदिर प्रतिदिन सुबह 5:00 बजे से रात 9:00 बजे तक दर्शन के लिए खुला रहता है। विशेष अवसरों या त्योहारों पर समय में बदलाव हो सकता है।",
     },
     {
-      question: "How can I book a specific puja?",
+      question: "मैं विशिष्ट पूजा कैसे बुक कर सकता हूँ?",
       answer:
-        "You can book pujas directly through our website by navigating to the 'Puja Services' section and selecting your desired puja.",
+        "आप हमारी वेबसाइट पर 'पूजा सेवाएं' सेक्शन में जाकर अपनी पसंदीदा पूजा का चयन करके सीधे पूजा बुक कर सकते हैं।",
     },
     {
-      question: "What is the cancellation policy?",
+      question: "कैसीनस से संबंधित नीति क्या है?",
       answer:
-        "Cancellations can be made up to 24 hours before the puja date. A small cancellation fee may apply.",
+        "पूजा की तारीख से 24 घंटे पहले तक रद्दीकरण किया जा सकता है। एक छोटी रद्दीकरण शुल्क लागू हो सकती है।",
     },
     {
-      question: "Can I reschedule my booking?",
+      question: "क्या मैं अपनी बुकिंग को पुनः निर्धारित कर सकता हूँ?",
       answer:
-        "Yes, you can reschedule your booking by contacting our support team at least 24 hours in advance.",
+        "हां, आप हमारी सहायता टीम से 24 घंटे पहले संपर्क करके अपनी बुकिंग को पुनः निर्धारित कर सकते हैं।",
     },
   ];
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (name && phone && message) {
+      const formData = { name, phone };
+      setLoading(true);
+
+      try {
+        const response = await fetch("/api/send-sms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert("धन्यवाद! आपका संदेश भेजा गया है और मालिक को सूचित किया गया है.");
+          setName("");
+          setPhone("");
+          setMessage("");
+        } else {
+          alert(result.error || "कुछ गलती हो गई। कृपया पुनः प्रयास करें।");
+        }
+      } catch (error) {
+        alert("संदेश भेजने में त्रुटि।");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert("कृपया सभी फ़ील्ड भरें।");
+    }
+  };
 
   return (
     <div id="contact" className="min-h-screen bg-gray-50 py-12 scroll-mt-16">
       <div className="container mx-auto px-4">
         {/* Page Title */}
         <h2 className="text-4xl font-extrabold tracking-tight text-gray-800 text-center mb-12">
-          Contact Us
+          संपर्क करें
         </h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-white shadow-lg rounded-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Send Us a Message
+              संदेश भेजें
             </h2>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Name
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  नाम
                 </label>
                 <input
                   type="text"
                   id="name"
                   name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="Your Name"
+                  placeholder="आपका नाम"
                   className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                  aria-label="Your Name"
                 />
               </div>
               <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  फोन नंबर
                 </label>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   required
-                  placeholder="Your Email"
+                  placeholder="आपका फोन नंबर"
                   className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                  aria-label="Your Email"
                 />
               </div>
               <div className="mb-4">
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Message
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+                  संदेश
                 </label>
                 <textarea
                   id="message"
                   name="message"
                   rows={6}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   required
-                  placeholder="Your Message"
+                  placeholder="आपका संदेश"
                   className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
-                  aria-label="Your Message"
                 ></textarea>
               </div>
               <button
                 type="submit"
                 className="w-full py-3 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition"
+                disabled={loading}
               >
-                Send Message
+                {loading ? "संदेश भेजा जा रहा है..." : "संदेश भेजें"}
               </button>
             </form>
           </div>
@@ -104,7 +143,7 @@ const ContactUs: React.FC = () => {
           {/* Contact Details */}
           <div className="bg-white shadow-lg rounded-lg p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Contact Details
+              संपर्क विवरण
             </h2>
             <ul className="space-y-6">
               <li className="flex items-center">
@@ -125,25 +164,6 @@ const ContactUs: React.FC = () => {
                 <span className="ml-4 text-gray-700">+91 12345 67890</span>
               </li>
               <li className="flex items-center">
-                {/* Email Icon */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-orange-500"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M16 12l6-6m-6 6l-6-6m6 6L6 6m6 6v6m-6-6h12" />
-                </svg>
-                <span className="ml-4 text-gray-700">
-                  support@baidyanathdham.com
-                </span>
-              </li>
-              <li className="flex items-center">
                 {/* Location Icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,14 +182,28 @@ const ContactUs: React.FC = () => {
                   Baidyanath Dham, Deoghar, Jharkhand, India
                 </span>
               </li>
+              <div className="mt-12 bg-white shadow-lg rounded-lg p-8">
+          <div className="w-full h-96">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d107586.67156610918!2d86.5394708!3d24.4556345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f1162b1519c019%3A0xdb8ce9bf0b62d036!2sShree+Baba+Baidyanath+Jyotirlinga+Mandir+Deoghar!5e0!3m2!1sen!2sus!4v1630624963833"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+            ></iframe>
+          </div>
+        </div>
             </ul>
           </div>
         </div>
 
+        {/* Google Map Embed */}
+
+
         {/* FAQ Section */}
         <div className="mt-16 bg-white shadow-lg rounded-lg p-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Frequently Asked Questions
+            अक्सर पूछे जाने वाले प्रश्न
           </h2>
           <div className="space-y-4">
             {faqs.map((faq, index) => (

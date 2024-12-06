@@ -11,44 +11,49 @@ interface Puja {
   image: string;
 }
 
-export const PujaServices: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedPuja, setSelectedPuja] = useState<Puja | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState("");
+interface SendSmsResponse {
+  success: boolean;
+  messageSid?: string;
+  error?: string;
+}
 
+export const PujaServices: React.FC = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedPuja, setSelectedPuja] = useState<Puja | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedTime, setSelectedTime] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>(""); // User phone number
+  const [name, setName] = useState<string>(""); // User name
+
+  // Puja list with all content in Hindi
   const pujaList: Puja[] = [
     {
-      name: "Rudrabhishek Pooja",
-      description:
-        "A powerful ritual to invoke Lord Shiva's blessings for prosperity and removal of obstacles.",
+      name: "रुद्राभिषेक पूजा",
+      description: "यह एक शक्तिशाली अनुष्ठान है जो भगवान शिव की कृपा प्राप्त करने के लिए किया जाता है, जिससे समृद्धि और बाधाओं का निवारण होता है।",
       price: "₹3,000",
       image: "/r.webp",
     },
     {
-      name: "Mahamrityunjaya Pooja",
-      description:
-        "A sacred chant to protect against negative energies and ensure long life and good health.",
+      name: "महामृत्युञ्जय पूजा",
+      description: "एक पवित्र मंत्र है, जो नकारात्मक ऊर्जा से रक्षा करने और लंबी उम्र और अच्छे स्वास्थ्य की सुनिश्चितता करता है।",
       price: "₹5,500",
       image: "/m.webp",
     },
     {
-      name: "Kalasarpa Dosha Pooja",
-      description:
-        "Perform this puja to overcome the effects of Kalasarpa Dosha and bring balance to your life.",
+      name: "कालसर्प दोष पूजा",
+      description: "यह पूजा कालसर्प दोष के प्रभावों को दूर करने और आपके जीवन में संतुलन लाने के लिए की जाती है।",
       price: "₹7,000",
       image: "/s.webp",
     },
     {
-      name: "Navagraha Shanti Pooja",
-      description:
-        "A ritual dedicated to the nine celestial bodies to nullify their negative effects on your horoscope.",
+      name: "नवग्रह शांति पूजा",
+      description: "यह अनुष्ठान नौ ग्रहों को समर्पित है ताकि उनके नकारात्मक प्रभावों को आपके कुंडली पर समाप्त किया जा सके।",
       price: "₹4,500",
       image: "/n.webp",
     },
   ];
 
-  const timeSlots = [
+  const timeSlots: string[] = [
     "10:30 AM - 11:00 AM",
     "11:00 AM - 11:30 AM",
     "11:30 AM - 12:00 PM",
@@ -66,15 +71,39 @@ export const PujaServices: React.FC = () => {
     setIsOpen(false);
     setSelectedDate(new Date());
     setSelectedTime("");
+    setPhoneNumber(""); // Reset phone number
+    setName(""); // Reset name
     setSelectedPuja(null);
   };
 
-  const handleBooking = () => {
-    if (selectedTime && selectedPuja) {
-      alert(
-        `You have successfully booked the ${selectedPuja.name} on ${selectedDate.toDateString()} at ${selectedTime}.`
-      );
-      closeDialog();
+  const handleBooking = async () => {
+    if (selectedTime && selectedPuja && phoneNumber && name) {
+      const message = `आपने ${selectedPuja.name} पूजा को ${selectedDate.toDateString()} को ${selectedTime} बजे बुक किया है। संपर्क विवरण: ${phoneNumber}`;
+
+      try {
+        const response = await fetch("api/send-sms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message,
+          }),
+        });
+
+        const result: SendSmsResponse = await response.json();
+
+        if (response.ok) {
+          alert("बुकिंग कन्फ़र्म की गई और आपकी फोन पर नोटिफिकेशन भेजी गई!");
+          closeDialog();
+        } else {
+          alert(result.error || "नोटिफिकेशन भेजने में विफल। कृपया फिर से प्रयास करें।");
+        }
+      } catch (error) {
+        alert(error);
+      }
+    } else {
+      alert("कृपया सभी फ़ील्ड भरें।");
     }
   };
 
@@ -82,7 +111,7 @@ export const PujaServices: React.FC = () => {
     <section id="services" className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-4xl font-extrabold tracking-tight text-gray-800 text-center mb-12">
-          Puja Services
+          पूजा सेवाएँ
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -108,7 +137,7 @@ export const PujaServices: React.FC = () => {
                   onClick={() => openDialog(puja)}
                   className="mt-6 px-6 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition"
                 >
-                  Book Now
+                  बुक करें
                 </button>
               </div>
             </div>
@@ -149,14 +178,14 @@ export const PujaServices: React.FC = () => {
                         as="h3"
                         className="text-lg font-medium leading-6 text-gray-900"
                       >
-                        Book {selectedPuja.name}
+                        {`बुक ${selectedPuja.name}`}
                       </DialogTitle>
                       <div className="mt-4">
                         <label
                           htmlFor="date"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Select Date
+                          तारीख़ चुनें
                         </label>
                         <input
                           type="date"
@@ -173,7 +202,7 @@ export const PujaServices: React.FC = () => {
                           htmlFor="time"
                           className="block text-sm font-medium text-gray-700"
                         >
-                          Select Time Slot
+                          समय स्लॉट चुनें
                         </label>
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           {timeSlots.map((slot, index) => (
@@ -191,19 +220,56 @@ export const PujaServices: React.FC = () => {
                           ))}
                         </div>
                       </div>
+
+                      {/* Name Field */}
+                      <div className="mt-4">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          आपका नाम
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="आपका नाम दर्ज करें"
+                          className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+                        />
+                      </div>
+
+                      {/* Phone Number Field */}
+                      <div className="mt-4">
+                        <label
+                          htmlFor="phoneNumber"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          फोन नंबर
+                        </label>
+                        <input
+                          type="text"
+                          id="phoneNumber"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="आपका फोन नंबर दर्ज करें"
+                          className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500"
+                        />
+                      </div>
+
                       <div className="mt-6 flex justify-end space-x-4">
                         <button
                           onClick={closeDialog}
                           className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
                         >
-                          Cancel
+                          रद्द करें
                         </button>
                         <button
                           onClick={handleBooking}
-                          disabled={!selectedTime}
+                          disabled={!selectedTime || !phoneNumber || !name}
                           className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                         >
-                          Book Now
+                          बुकिंग कन्फ़र्म करें
                         </button>
                       </div>
                     </>

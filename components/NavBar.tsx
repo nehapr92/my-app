@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Mark this component as Client-side
 
 import { useState, useEffect } from "react";
 import LogoIcon from "../images/logo.webp";
@@ -23,30 +23,31 @@ const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <nav
-      className="bg-cover bg-center bg-orange-400 text-white sticky top-0 z-50"
-    >
+    <nav className="bg-cover bg-center bg-orange-400 text-white sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
         {/* Logo */}
-        <div className="flex items-center space-x-2 text-2xl font-bold">
+        <div className="flex items-center space-x-2 text-3xl font-extrabold"> {/* Increased font size for title */}
           {/* Website Icon */}
-          <div className="border-2 border-orange-400 rounded-full p-1">
-          <Image
-            src={LogoIcon} // Replace with your image path
-            alt="Website Icon"
-            width={40} // Adjust size as needed
-            height={40}
-            className="rounded-full" // Optional: Add rounded corners
-          /></div>
-          <span>Baidyanathdham Darshan</span>
+          <div className="border-2 border-orange-400 rounded-full p-2">
+            <Image
+              src={LogoIcon}
+              alt="वेबसाइट आइकन"
+              width={60} // Increased width for bigger icon
+              height={60} // Increased height for bigger icon
+              className="rounded-full"
+            />
+          </div>
+          <span>Babadham Darshan</span> {/* Updated title in Hindi */}
         </div>
 
         {/* Hamburger Menu */}
         <button
           className="block lg:hidden focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen ? "true" : "false"}
+          aria-controls="navbar-menu"
         >
-          <span className="sr-only">Toggle Navigation</span>
+          <span className="sr-only">नेविगेशन टॉगल करें</span> {/* Accessibility improvement */}
           {isOpen ? (
             <svg
               className="w-6 h-6"
@@ -82,21 +83,21 @@ const Navbar: React.FC = () => {
 
         {/* Navigation Links */}
         <ul
+          id="navbar-menu"
           className={`fixed lg:static top-16 left-0 w-full lg:w-auto ${
             isOpen ? "flex" : "hidden"
-          } lg:flex lg:space-x-6 text-gray-300 font-medium transition-all duration-300 ${
+          } lg:flex lg:space-x-8 text-gray-300 font-medium transition-all duration-300 ${
             isOpen ? "flex flex-col space-y-4 p-8 bg-orange-400" : ""
           }`}
         >
-
-          <li className="text-center lg:inline-block">
+          <li className="text-center lg:inline-block text-xl font-semibold"> {/* Slightly bolder and smaller */}
             <Link href="#services" onClick={() => setIsOpen(false)}>
-              Pooja Services
+              पूजा सेवाएं
             </Link>
           </li>
-          <li className="text-center lg:inline-block">
+          <li className="text-center lg:inline-block text-xl font-semibold"> {/* Slightly bolder and smaller */}
             <Link href="#contact" onClick={() => setIsOpen(false)}>
-              Contact Us
+              संपर्क करें
             </Link>
           </li>
         </ul>
